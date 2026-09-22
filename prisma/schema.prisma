@@ -1,0 +1,40 @@
+// 진실의 원천(source of truth) — 수집기·블로그·달력·릴스가 전부 이 스키마를 공유한다.
+// 자세한 배경은 프로젝트 루트 CLAUDE.md 참고.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Event {
+  id        String @id @default(cuid())
+
+  title       String
+  description String?
+
+  category String // 축제/공연/팝업/마켓 등 (수집처마다 코드 체계가 달라 우선 자유 문자열)
+  region   String // 시/도 단위 지역
+
+  address   String?
+  latitude  Float?
+  longitude Float?
+
+  thumbnailUrl String?
+
+  startDate DateTime
+  endDate   DateTime?
+
+  source    String // 수집 출처 (예: tourapi, kopis, manual)
+  sourceUrl String // 원본 상세 페이지 URL
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([source, sourceUrl]) // 같은 출처의 같은 행사 재수집 시 중복 방지
+  @@index([startDate])
+  @@index([region])
+}

@@ -42,3 +42,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
+
+# prisma init auto-installs these AI agent skill docs; not part of this repo's plan
+/.agents/
+/.claude/
+/.windsurf/
+/skills-lock.json
