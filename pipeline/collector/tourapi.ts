@@ -1,6 +1,7 @@
 // 한국관광공사 TourAPI(KorService2) 행사정보조회(searchFestival2) 수집.
 // 문서: https://www.data.go.kr/data/15101578/openapi.do  (키 발급도 여기서)
 import { regionFromLDongCode } from "@/lib/regions";
+import { kstYmd, parseKstDate, type CollectedEvent, type Collector } from "./types";
 
 const ENDPOINT = "https://apis.data.go.kr/B551011/KorService2/searchFestival2";
 const PAGE_SIZE = 100;
@@ -29,32 +30,11 @@ type FestivalResponse = {
   };
 };
 
-export type CollectedEvent = {
-  title: string;
-  category: string;
-  region: string;
-  address: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  thumbnailUrl: string | null;
-  startDate: Date;
-  endDate: Date | null;
-  source: string;
-  sourceUrl: string;
-};
-
 function serviceKey() {
   const key = process.env.TOURAPI_SERVICE_KEY;
   if (!key) throw new Error("TOURAPI_SERVICE_KEY가 설정되지 않았습니다 (.env.local 확인)");
   // data.go.kr은 Encoding/Decoding 키 두 개를 주는데, 어느 쪽을 넣어도 동작하게 디코딩해 둔다
   return key.includes("%") ? decodeURIComponent(key) : key;
-}
-
-// YYYYMMDD → 한국 시간 자정
-export function parseKstDate(yyyymmdd: string | undefined): Date | null {
-  if (!yyyymmdd || !/^\d{8}$/.test(yyyymmdd)) return null;
-  const [y, m, d] = [yyyymmdd.slice(0, 4), yyyymmdd.slice(4, 6), yyyymmdd.slice(6, 8)];
-  return new Date(`${y}-${m}-${d}T00:00:00+09:00`);
 }
 
 function toNumber(value: string | undefined): number | null {
@@ -109,16 +89,20 @@ async function fetchPage(eventStartDate: string, pageNo: number) {
   return { items: Array.isArray(raw) ? raw : [raw], totalCount: body.totalCount };
 }
 
-// eventStartDate(YYYYMMDD) 이후에도 진행 중이거나 예정인 행사 전부
-export async function collectFestivals(eventStartDate: string): Promise<CollectedEvent[]> {
-  const events: CollectedEvent[] = [];
-  for (let pageNo = 1; ; pageNo++) {
-    const { items, totalCount } = await fetchPage(eventStartDate, pageNo);
-    for (const item of items) {
-      const event = toEvent(item);
-      if (event) events.push(event);
+// 오늘 이후에도 진행 중이거나 예정인 행사 전부
+export const tourapi: Collector = {
+  source: "tourapi",
+  async collect() {
+    const from = kstYmd();
+    const events: CollectedEvent[] = [];
+    for (let pageNo = 1; ; pageNo++) {
+      const { items, totalCount } = await fetchPage(from, pageNo);
+      for (const item of items) {
+        const event = toEvent(item);
+        if (event) events.push(event);
+      }
+      if (items.length === 0 || pageNo * PAGE_SIZE >= totalCount) break;
     }
-    if (items.length === 0 || pageNo * PAGE_SIZE >= totalCount) break;
-  }
-  return events;
-}
+    return { events, window: { from: parseKstDate(from)! } };
+  },
+};

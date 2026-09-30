@@ -1,5 +1,5 @@
-# 매일 TourAPI 행사 수집 → Neon DB upsert
-# 필요한 레포 시크릿: DATABASE_URL, TOURAPI_SERVICE_KEY
+# 매일 TourAPI·KOPIS 행사 수집 → Neon DB upsert
+# 필요한 레포 시크릿: DATABASE_URL, TOURAPI_SERVICE_KEY, KOPIS_SERVICE_KEY
 name: collect
 
 on:
@@ -27,3 +27,4 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TOURAPI_SERVICE_KEY: ${{ secrets.TOURAPI_SERVICE_KEY }}
+          KOPIS_SERVICE_KEY: ${{ secrets.KOPIS_SERVICE_KEY }}
