@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const to = parseDate(searchParams.get("to"));
   const region = searchParams.get("region") || undefined;
 
-  const where: Prisma.EventWhereInput = { region };
+  const where: Prisma.EventWhereInput = { region, removedAt: null }; // 출처에서 사라진 행사 제외
   if (to) where.startDate = { lte: to };
   if (from) {
     // 종료일이 없으면 시작일 하루짜리 행사로 본다

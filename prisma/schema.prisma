@@ -31,10 +31,14 @@ model Event {
   source    String // 수집 출처 (예: tourapi, kopis, manual)
   sourceUrl String // 원본 상세 페이지 URL
 
+  lastSeenAt DateTime  @default(now()) // 수집기가 마지막으로 이 행사를 본 시각
+  removedAt  DateTime? // 출처에서 사라진(취소·삭제) 시각. null이면 유효. 재등장하면 다시 null
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([source, sourceUrl]) // 같은 출처의 같은 행사 재수집 시 중복 방지
   @@index([startDate])
   @@index([region])
+  @@index([source, removedAt])
 }

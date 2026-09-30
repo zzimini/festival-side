@@ -51,7 +51,7 @@ function serviceKey() {
 }
 
 // YYYYMMDD → 한국 시간 자정
-function parseKstDate(yyyymmdd: string | undefined): Date | null {
+export function parseKstDate(yyyymmdd: string | undefined): Date | null {
   if (!yyyymmdd || !/^\d{8}$/.test(yyyymmdd)) return null;
   const [y, m, d] = [yyyymmdd.slice(0, 4), yyyymmdd.slice(4, 6), yyyymmdd.slice(6, 8)];
   return new Date(`${y}-${m}-${d}T00:00:00+09:00`);
@@ -93,7 +93,8 @@ async function fetchPage(eventStartDate: string, pageNo: number) {
     pageNo: String(pageNo),
     eventStartDate,
   });
-  const res = await fetch(`${ENDPOINT}?${params}`);
+  // 응답이 없을 때 크론이 멈춰 있지 않도록 타임아웃
+  const res = await fetch(`${ENDPOINT}?${params}`, { signal: AbortSignal.timeout(30_000) });
   const text = await res.text();
   // 키 오류 등은 _type=json이어도 XML로 돌아온다
   if (!res.ok || !text.trimStart().startsWith("{")) {
