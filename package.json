@@ -6,10 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "collect": "tsx --env-file-if-exists=.env.local pipeline/collector/index.ts",
+    "postinstall": "prisma generate --config prisma7.config.ts"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
+    "exceljs": "^4.4.0",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8"
