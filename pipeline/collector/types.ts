@@ -22,14 +22,15 @@ export type CollectResult = {
 
 export type Collector = {
   source: string;
+  requiredEnv: string[]; // 하나라도 없으면 실패 대신 건너뜀 (키 발급 전인 출처)
   collect(): Promise<CollectResult>;
 };
 
-// YYYYMMDD 또는 YYYY.MM.DD → 한국 시간 자정
-export function parseKstDate(value: string | undefined): Date | null {
+// YYYYMMDD 또는 YYYY.MM.DD → 날짜 (DB가 DATE 컬럼이라 UTC 자정으로 표현)
+export function parseYmd(value: string | undefined): Date | null {
   const digits = value?.replaceAll(".", "");
   if (!digits || !/^\d{8}$/.test(digits)) return null;
-  return new Date(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}T00:00:00+09:00`);
+  return new Date(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}T00:00:00Z`);
 }
 
 // 한국 시간 기준 오늘 + days → YYYYMMDD

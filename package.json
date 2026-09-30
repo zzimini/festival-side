@@ -8,16 +8,19 @@
     "start": "next start",
     "lint": "eslint",
     "collect": "tsx --env-file-if-exists=.env.local pipeline/collector/index.ts",
-    "postinstall": "prisma generate --config prisma7.config.ts"
+    "postinstall": "prisma generate --config prisma7.config.ts",
+    "enrich": "tsx --env-file-if-exists=.env.local pipeline/enricher/index.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.129.0",
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
     "exceljs": "^4.4.0",
     "fast-xml-parser": "^5.11.2",
     "next": "16.3.5",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

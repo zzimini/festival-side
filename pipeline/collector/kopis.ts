@@ -2,7 +2,7 @@
 // 키 발급: https://www.kopis.or.kr/por/cs/openapi/openApiList.do
 import { XMLParser } from "fast-xml-parser";
 import { regionFromName } from "@/lib/regions";
-import { kstYmd, parseKstDate, type CollectedEvent, type Collector } from "./types";
+import { kstYmd, parseYmd, type CollectedEvent, type Collector } from "./types";
 
 const ENDPOINT = "https://www.kopis.or.kr/openApi/restful/pblprfr";
 const PAGE_SIZE = 100;
@@ -51,7 +51,7 @@ async function fetchPage(genre: string, stdate: string, eddate: string, cpage: n
 }
 
 function toEvent(item: PerformanceItem, category: string): CollectedEvent | null {
-  const startDate = parseKstDate(item.prfpdfrom);
+  const startDate = parseYmd(item.prfpdfrom);
   if (!startDate) return null;
   return {
     title: item.prfnm.trim(),
@@ -62,7 +62,7 @@ function toEvent(item: PerformanceItem, category: string): CollectedEvent | null
     longitude: null,
     thumbnailUrl: item.poster || null,
     startDate,
-    endDate: parseKstDate(item.prfpdto),
+    endDate: parseYmd(item.prfpdto),
     source: "kopis",
     sourceUrl: `https://www.kopis.or.kr/por/db/pblprfr/pblprfrView.do?menuId=MNU_00020&mt20Id=${item.mt20id}`,
   };
@@ -70,6 +70,7 @@ function toEvent(item: PerformanceItem, category: string): CollectedEvent | null
 
 export const kopis: Collector = {
   source: "kopis",
+  requiredEnv: ["KOPIS_SERVICE_KEY"],
   async collect() {
     // 기간을 나눠 조회하면 여러 구간에 걸친 공연이 중복으로 오므로 공연 ID로 합친다
     const byId = new Map<string, CollectedEvent>();
@@ -89,7 +90,7 @@ export const kopis: Collector = {
     }
     return {
       events: [...byId.values()],
-      window: { from: parseKstDate(kstYmd())!, to: parseKstDate(kstYmd(WINDOW_DAYS - 1))! },
+      window: { from: parseYmd(kstYmd())!, to: parseYmd(kstYmd(WINDOW_DAYS - 1))! },
     };
   },
 };

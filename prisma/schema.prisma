@@ -25,14 +25,24 @@ model Event {
 
   thumbnailUrl String?
 
-  startDate DateTime
-  endDate   DateTime?
+  // 날짜만 저장 (시간대 혼동 방지). 행사 현지(한국) 날짜 그대로
+  startDate DateTime  @db.Date
+  endDate   DateTime? @db.Date
+
+  // 상세 정보 (enricher가 출처 상세 API에서 채움)
+  openHours       String? // 운영/공연 시간
+  fee             String? // 이용 요금
+  homepage        String?
+  program         String? // 주요 프로그램
+  detailFetchedAt DateTime?
 
   source    String // 수집 출처 (예: tourapi, kopis, manual)
   sourceUrl String // 원본 상세 페이지 URL
 
   lastSeenAt DateTime  @default(now()) // 수집기가 마지막으로 이 행사를 본 시각
   removedAt  DateTime? // 출처에서 사라진(취소·삭제) 시각. null이면 유효. 재등장하면 다시 null
+
+  prepItems PrepItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -41,4 +51,21 @@ model Event {
   @@index([startDate])
   @@index([region])
   @@index([source, removedAt])
+}
+
+// 행사별 준비물 (enricher가 LLM으로 생성 → 검수 → composer가 글에 사용, matcher가 쿠팡 검색어로 사용)
+model PrepItem {
+  id      String @id @default(cuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  name          String // 예: 바람막이
+  reason        String // 왜 필요한지 한 문장
+  searchKeyword String // 쿠팡 검색어
+  priority      String // 필수 | 추천
+  sortOrder     Int
+
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
 }

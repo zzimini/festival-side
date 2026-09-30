@@ -66,6 +66,11 @@ async function main() {
   // 한 출처가 실패해도 나머지는 계속 수집
   let failed = 0;
   for (const collector of targets) {
+    const missing = collector.requiredEnv.filter((name) => !process.env[name]);
+    if (missing.length > 0) {
+      console.log(`[collector:${collector.source}] 건너뜀: ${missing.join(", ")} 미설정`);
+      continue;
+    }
     try {
       await run(collector);
     } catch (err) {
