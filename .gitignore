@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# composer 미리보기 (pnpm compose 출력)
+/drafts/
+
 # production
 /build
 

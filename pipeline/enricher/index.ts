@@ -2,16 +2,9 @@
 // 1) 출처 상세 API로 설명·운영시간 등을 채우고  2) Claude로 준비물 초안을 만들어 저장한다.
 // 기존 준비물은 새 초안으로 교체된다.
 import { db } from "@/lib/db";
+import { findEvent } from "../find-event";
 import { fetchDetail } from "./detail";
 import { generatePrepList } from "./prep";
-
-async function findEvent(query: string) {
-  const byId = await db.event.findUnique({ where: { id: query } });
-  if (byId) return byId;
-  const matches = await db.event.findMany({ where: { title: query, removedAt: null } });
-  if (matches.length > 1) throw new Error(`"${query}" 행사가 ${matches.length}건입니다. 이벤트 ID로 지정해 주세요.`);
-  return matches[0] ?? null;
-}
 
 async function main() {
   const query = process.argv.slice(2).join(" ").trim();
