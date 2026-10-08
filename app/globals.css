@@ -24,3 +24,69 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 블로그 글 본문 (composer가 만든 HTML 조각) */
+.post-body {
+  line-height: 1.8;
+}
+.post-body h2 {
+  margin: 2.5rem 0 0.75rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.post-body h3 {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+.post-body p {
+  margin: 0.6rem 0;
+}
+.post-body ul {
+  margin: 0.6rem 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+.post-body li {
+  margin: 0.35rem 0;
+}
+.post-body a {
+  color: #2563eb;
+  text-decoration: underline;
+  word-break: break-all;
+}
+.post-body figure img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+}
+.post-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.post-body th,
+.post-body td {
+  border: 1px solid #d4d4d8;
+  padding: 0.4rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+.post-body th {
+  width: 6.5em;
+  white-space: nowrap;
+  background: #f4f4f5;
+}
+.post-body hr {
+  margin: 2.5rem 0 1rem;
+  border-color: #d4d4d8;
+}
+.post-body small {
+  font-size: 0.85rem;
+  color: #71717a;
+}
+@media (prefers-color-scheme: dark) {
+  .post-body th { background: #18181b; }
+  .post-body th, .post-body td, .post-body hr { border-color: #3f3f46; }
+  .post-body a { color: #60a5fa; }
+}

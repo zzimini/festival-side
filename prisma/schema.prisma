@@ -43,6 +43,7 @@ model Event {
   removedAt  DateTime? // 출처에서 사라진(취소·삭제) 시각. null이면 유효. 재등장하면 다시 null
 
   prepItems PrepItem[]
+  post      Post?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -68,4 +69,24 @@ model PrepItem {
   createdAt DateTime @default(now())
 
   @@index([eventId])
+}
+
+// 발행된 블로그 글 (publisher가 composer 결과를 저장 → Next.js /posts/[id]가 읽어 보여줌)
+// 행사당 글 1개. 다시 발행하면 같은 글을 갱신한다.
+model Post {
+  id      String @id @default(cuid())
+  eventId String @unique
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  title   String
+  excerpt String
+  html    String // 본문 HTML 조각 (composer 출력)
+
+  status      String // draft(검수 대기) | published
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, publishedAt])
 }
